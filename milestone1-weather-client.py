@@ -1,5 +1,3 @@
-```python
-
 import requests
 import json
 from datetime import datetime
@@ -19,7 +17,7 @@ class WeatherAPIError(Exception):
         return self.message
 
 class LocationNotFoundError(WeatherAPIError):
-    """Raised when weather location is not found"""
+    
     def __init__(self, location: str, **kwargs):
         message = f"Weather location not found: {location}"
         super().__init__(message, **kwargs)
@@ -28,19 +26,19 @@ class WeatherClient:
   
     
     def __init__(self):
-        """Initialize the weather client with API endpoints"""
+        
         self.geocoding_url = "https://geocoding-api.open-meteo.com/v1/search"
         self.weather_url = "https://api.open-meteo.com/v1/forecast"
         self.session = self._create_session()
     
     def _create_session(self) -> requests.Session:
-        """Create HTTP session with retry logic and timeout"""
+      
         from requests.adapters import HTTPAdapter
         from urllib3.util.retry import Retry
         
         session = requests.Session()
         
-        # Set up retry strategy for resilient API calls
+     
         retry_strategy = Retry(
             total=3,
             backoff_factor=1,
@@ -68,7 +66,7 @@ class WeatherClient:
             LocationNotFoundError: If the location is not found
             WeatherAPIError: For other API errors
         """
-        # Prepare query parameters
+        
         params = {
             "name": city,
             "count": 1,
@@ -84,7 +82,7 @@ class WeatherClient:
             print(f" Request URL: {self.geocoding_url}")
             print(f" Parameters: {params}")
             
-            # Make the HTTP request
+       
             response = self.session.get(
                 self.geocoding_url,
                 params=params,
@@ -94,7 +92,7 @@ class WeatherClient:
             print(f" Response Status Code: {response.status_code}")
             print(f" Final URL: {response.url}")
             
-            # Handle HTTP errors
+         
             if not response.ok:
                 raise WeatherAPIError(
                     f"Geocoding API request failed: {response.reason}",
@@ -106,11 +104,11 @@ class WeatherClient:
             data = response.json()
             print(f" Raw Response: {json.dumps(data, indent=2)}")
             
-            # Check if any results were found
+    
             if not data.get("results"):
                 raise LocationNotFoundError(f"{city}, {country}")
             
-            # Extract first result
+          
             location = data["results"][0]
             result = {
                 "latitude": location["latitude"],
@@ -147,7 +145,7 @@ class WeatherClient:
         Raises:
             WeatherAPIError: For API errors
         """
-        # Prepare query parameters for weather API
+        
         params = {
             "latitude": latitude,
             "longitude": longitude,
@@ -160,7 +158,7 @@ class WeatherClient:
             print(f" Request URL: {self.weather_url}")
             print(f" Parameters: {params}")
             
-            # Make the HTTP request
+            
             response = self.session.get(
                 self.weather_url,
                 params=params,
@@ -170,7 +168,7 @@ class WeatherClient:
             print(f" Response Status Code: {response.status_code}")
             print(f" Final URL: {response.url}")
             
-            # Handle HTTP errors
+            
             if not response.ok:
                 raise WeatherAPIError(
                     f"Weather API request failed: {response.reason}",
@@ -178,11 +176,11 @@ class WeatherClient:
                     url=str(response.url)
                 )
             
-            # Parse JSON response
+            
             data = response.json()
             print(f" Raw Response: {json.dumps(data, indent=2)}")
             
-            # Extract current weather data
+            
             current = data.get("current_weather", {})
             result = {
                 "temperature_c": current.get("temperature"),
@@ -204,5 +202,5 @@ class WeatherClient:
             raise WeatherAPIError("Invalid weather JSON response", url=str(response.url))
 
 
-```
+
 
